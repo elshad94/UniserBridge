@@ -1,0 +1,1 @@
+Scaffold-DbContext "Server=192.168.37.33; Database=DB_UniserBridge; User Id=sa;Password=Uniser!@#; TrustServerCertificate=True" -OutputDir Entities/Models -ContextDir DataAccess/Concrete/EntityFramework/Contexts -Context ProjectAppDbContextBase  Microsoft.EntityFrameworkCore.SqlServer  -force 

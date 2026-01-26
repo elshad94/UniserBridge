@@ -1,0 +1,38 @@
+{
+  "ProjectAppDbConnectionModel": {
+    "serverName": "192.168.37.33",
+    "database": "DB_UniserBridge",
+    "username": "sa",
+    "password": "Uniser!@#",
+    "trustedConnection": false
+  },
+
+  "JwtOptions": {
+    "Audience": "localhost",
+    "Issuer": "localhost",
+    "AccessTokenExpiration": 500,
+    "SecurityKey": "EmptyAPI12Uniser12Group12",
+    "RefreshTokenSecurityKey": "Uniser12EmptyAPI12Group12"
+  },
+  "EmailOptions": {
+    "username": "no-reply@uniser.az",
+    "password": "f42236Ws@W4457!",
+    "displayName": "",
+    "host": "mail.uniser.az",
+    "port": 25,
+    "enableSsl": false,
+    "useDefaultCredentials": false
+  },
+  "CorsPolicyOrigins": [
+    "http://localhost:4200", //Angular default local port
+    "http://localhost:5050", //Server local IP
+   // "https://alliance-border.program.az" //global IP
+  ],
+  "DefaultLanguage": "EN",
+  "GlobalKey": "",
+  "OctosApiCredentials": {
+    "ApiKey": "",
+    "Username": "OCTOS",
+    "Password": "R]xvEw^s8fNL]-^N)wTu"
+  }
+}
