@@ -12,5 +12,6 @@ namespace Project.Entities.Dtos.RequestOperations
         public string Podcode { get; set; }
         public decimal TotalSale { get; set; }
         public string Currency { get; set; }
+        public string OrderStatus { get; set; }
     }
 }

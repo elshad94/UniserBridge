@@ -1,4 +1,5 @@
 ﻿using Project.Core.Utilities.Results;
+using Project.Entities.Dtos.CancelOrder;
 using Project.Entities.Dtos.RequestOperations;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,6 @@ namespace Project.Business.Services.Abstract
     {
         Task<Result> GetFirmRequest(FirmRequestData model);
         Task<Result> GetOrderResponse(RequestTokenData model);
-
+        Task<Result> CancelIntegratedOrder(CancelRequestModel model);
     }
 }

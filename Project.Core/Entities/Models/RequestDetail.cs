@@ -15,4 +15,5 @@ public partial class RequestDetail
     public string ResponseData { get; set; }
 
     public DateTime? CreatedDate { get; set; }
+    public string MethodName { get; set; }
 }

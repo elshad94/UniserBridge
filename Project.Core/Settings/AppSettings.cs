@@ -23,6 +23,7 @@ namespace Project.Core.Settings
         public string DefaultLanguage { get; set; }
         public string GlobalKey { get; set; }
         public OctosApiCredentials OctosApiCredentials { get; set; }
+        public AgtApiCredentials AgtApiCredentials { get; set; }
 
 
 

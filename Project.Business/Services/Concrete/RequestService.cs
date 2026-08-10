@@ -9,10 +9,12 @@ using Newtonsoft.Json;
 using Project.Business.Services.Abstract;
 using Project.Core.Entities.Dtos.CommonDtos;
 using Project.Core.Entities.Models;
+using Project.Core.Enums;
 using Project.Core.Settings;
 using Project.Core.Utilities.Results;
 using Project.Core.Utilities.Tools;
 using Project.DataAccess.Repositories.Abstract.RequestOperations;
+using Project.Entities.Dtos.CancelOrder;
 using Project.Entities.Dtos.RequestOperations;
 using System;
 using System.Collections.Generic;
@@ -50,6 +52,7 @@ namespace Project.Business.Services.Concrete
 
             requestModel.UserId = model.UserId;
             requestModel.RequestData = stringPayload;
+            requestModel.MethodName = "GetFirmRequest";
             requestModel.CreatedDate = DateTime.Now;
             //operationResult = _requestRepository.Add(requestModel);
             //var mapData = _mapper.Map<RequestDetail>(model);
@@ -65,7 +68,7 @@ namespace Project.Business.Services.Concrete
 
             string responseData = await OctosIntegration(model);
 
-            
+
 
             requestModel.ResponseData = responseData;
             result.Data = responseData; //_requestRepository.FindById(1).ResponseData;// responseData;
@@ -74,7 +77,7 @@ namespace Project.Business.Services.Concrete
             return result;
         }
 
-        private async Task<string>  OctosIntegration(FirmRequestData model)
+        private async Task<string> OctosIntegration(FirmRequestData model)
         {
             Result result = new Result();
             HttpMethods http = new HttpMethods();
@@ -118,7 +121,7 @@ namespace Project.Business.Services.Concrete
 
             HttpMethods http = new HttpMethods();
             List<ResponseData> responseList = new List<ResponseData>();
-            OrderResponseData orderResponseData = new OrderResponseData(); 
+            OrderResponseData orderResponseData = new OrderResponseData();
 
             BasicAuthDto basicAuth = new()
             {
@@ -134,6 +137,7 @@ namespace Project.Business.Services.Concrete
             var stringPayload = JsonConvert.SerializeObject(model);
             requestModel.UserId = model.UserId;
             requestModel.RequestData = stringPayload;
+            requestModel.MethodName = "GetOrderResponse";
             requestModel.CreatedDate = DateTime.Now;
 
             foreach (var token in model.TokenList)
@@ -158,5 +162,59 @@ namespace Project.Business.Services.Concrete
             return result;
         }
 
+        public async Task<Result> CancelIntegratedOrder(CancelRequestModel model)
+        {
+            Result result = new Result();
+            RequestDetail requestModel = new RequestDetail();
+
+            if (model == null)
+                return new(new { model }, ResultInfo.NotFound);
+
+            var stringPayload = JsonConvert.SerializeObject(model);
+
+            if (model.ContractApiIntegrationCode != ClientList.AGT_Cargo.ContractApiIntegrationCode)
+                return new(new { }, ResultInfo.NotFound);
+
+            requestModel.UserId = ClientList.AGT_Cargo.UserId;
+            requestModel.RequestData = stringPayload;
+            requestModel.MethodName = "CancelIntegratedOrder";
+            requestModel.CreatedDate = DateTime.Now;
+
+            string responseData = await ImsartCancelOrder(model);
+            var response = JsonConvert.DeserializeObject<CancelResponse>(responseData);
+
+
+            requestModel.ResponseData = responseData;
+            result.Data = response.d; //_requestRepository.FindById(1).ResponseData;// responseData;
+            _requestRepository.Add(requestModel);
+
+            return result;
+        }
+
+        private async Task<string> ImsartCancelOrder(CancelRequestModel model)
+        {
+            HttpMethods http = new HttpMethods();
+            List<RequestHeader> requestHeaders = new List<RequestHeader>();
+            string token = CommonTools.GenerateMd5(
+                    $"{DateTime.Now.Day}{DateTime.Now.Year}{DateTime.Now.Month}{AppSettings.Settings.AgtApiCredentials.HeaderToken}"
+                );
+            requestHeaders.Add(new RequestHeader
+            {
+                Name = AppSettings.Settings.AgtApiCredentials.HeaderName,
+                Value = token
+            });
+
+            try
+            {
+                string url = $"http://213.172.85.5:3445/Integration.asmx/CancelIntegratedOrder";
+                string apiResponse = await http.PostAsync(url, content: new { token = model.Token }, requestHeaders, basicAuthorization: false);
+
+                return apiResponse;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
     }
 }

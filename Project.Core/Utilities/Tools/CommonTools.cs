@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Mail;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Project.Core.Utilities.Tools
@@ -200,6 +201,22 @@ namespace Project.Core.Utilities.Tools
         }
 
         public static string GetAppSetting(string key) => new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetValue<string>(key);
+        public static string GenerateMd5(string input)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in hashBytes)
+                {
+                    sb.Append(b.ToString("x2")); // Kiçik hərflərlə hex
+                }
+
+                return sb.ToString();
+            }
+        }
 
         #region Number to words
         public static string NumberToWords(string number, string lang = "AZ", int currencyId = 1)

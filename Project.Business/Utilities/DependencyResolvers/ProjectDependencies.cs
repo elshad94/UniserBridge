@@ -1,12 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Project.Core.DataAccess.Abstract;
 using Project.Core.DataAccess.Concrete.EntityFramework.Repositories;
-using Project.DataAccess.Repositories.Abstract.CardOperations;
-using Project.DataAccess.Repositories.Abstract.Common;
-using Project.DataAccess.Repositories.Abstract.System;
-using Project.DataAccess.Repositories.Concrete.CardOperations;
-using Project.DataAccess.Repositories.Concrete.Common;
-using Project.DataAccess.Repositories.Concrete.System;
+
 
 namespace Project.Business.Utilities.DependencyResolvers
 {
