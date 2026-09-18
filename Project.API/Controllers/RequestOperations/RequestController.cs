@@ -34,7 +34,7 @@ namespace Project.API.Controllers.RequestOperations
 
         }
         [HttpPost]
-        public async Task<IActionResult> CancelIntegratedOrder([FromBody] List<CancelRequestModel> model)
+        public async Task<IActionResult> CancelIntegratedOrder([FromBody] CancelRequestModel model)
         {
             var data = await _requestService.CancelIntegratedOrder(model);
             return data.AsObjectResult();

@@ -162,49 +162,37 @@ namespace Project.Business.Services.Concrete
             return result;
         }
 
-        public async Task<Result> CancelIntegratedOrder(List<CancelRequestModel> models)
+        public async Task<Result> CancelIntegratedOrder(CancelRequestModel model)
         {
             Result result = new Result();
+            RequestDetail requestModel = new RequestDetail();
 
-            if (models == null || !models.Any())
-                return new(new { models }, ResultInfo.NotFound);
+            if (model == null)
+                return new(new { model }, ResultInfo.NotFound);
 
-            var responses = new List<object>();
+            var stringPayload = JsonConvert.SerializeObject(model);
 
-            foreach (var model in models)
+            requestModel.UserId = ClientList.AGT_Cargo.UserId;
+            requestModel.RequestData = stringPayload;
+            requestModel.MethodName = "CancelIntegratedOrder";
+            requestModel.CreatedDate = DateTime.Now;
+
+            if (model.ContractApiIntegrationCode != ClientList.AGT_Cargo.ContractApiIntegrationCode)
             {
-                RequestDetail requestModel = new RequestDetail();
-                var stringPayload = JsonConvert.SerializeObject(model);
-
-                requestModel.UserId = ClientList.AGT_Cargo.UserId;
-                requestModel.RequestData = stringPayload;
-                requestModel.MethodName = "CancelIntegratedOrder";
-                requestModel.CreatedDate = DateTime.Now;
-
-                if (model.ContractApiIntegrationCode != ClientList.AGT_Cargo.ContractApiIntegrationCode)
-                {
-                    requestModel.ResponseData = "Invalid ContractApiIntegrationCode";
-                    _requestRepository.Add(requestModel);
-                    continue;
-                }
-
-                try
-                {
-                    string responseData = await ImsartCancelOrder(model);
-                    var response = JsonConvert.DeserializeObject<CancelResponse>(responseData);
-
-                    requestModel.ResponseData = responseData;
-                    responses.Add(new { model.Token, Success = true, Data = response?.d });
-                }
-                catch (Exception ex)
-                {
-                    requestModel.ResponseData = ex.Message;
-                    responses.Add(new { model.Token, Success = false, Error = ex.Message });
-                }
+                requestModel.ResponseData = "Invalid ContractApiIntegrationCode";
                 _requestRepository.Add(requestModel);
+
+                return new(new { }, ResultInfo.NotFound);
             }
 
-            result.Data = responses;
+            string responseData = await ImsartCancelOrder(model);
+            var response = JsonConvert.DeserializeObject<CancelResponse>(responseData);
+
+
+            requestModel.ResponseData = responseData;
+            result.Data = response.d;
+            _requestRepository.Add(requestModel);
+
             return result;
         }
 
