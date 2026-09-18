@@ -13,6 +13,6 @@ namespace Project.Business.Services.Abstract
     {
         Task<Result> GetFirmRequest(FirmRequestData model);
         Task<Result> GetOrderResponse(RequestTokenData model);
-        Task<Result> CancelIntegratedOrder(CancelRequestModel model);
+        Task<Result> CancelIntegratedOrder(List<CancelRequestModel> model);
     }
 }

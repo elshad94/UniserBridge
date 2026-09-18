@@ -7,9 +7,9 @@ using DocumentFormat.OpenXml.Office.CustomUI;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Newtonsoft.Json;
 using Project.Business.Services.Abstract;
+using Project.Core.Entities;
 using Project.Core.Entities.Dtos.CommonDtos;
 using Project.Core.Entities.Models;
-using Project.Core.Enums;
 using Project.Core.Settings;
 using Project.Core.Utilities.Results;
 using Project.Core.Utilities.Tools;
@@ -162,32 +162,49 @@ namespace Project.Business.Services.Concrete
             return result;
         }
 
-        public async Task<Result> CancelIntegratedOrder(CancelRequestModel model)
+        public async Task<Result> CancelIntegratedOrder(List<CancelRequestModel> models)
         {
             Result result = new Result();
-            RequestDetail requestModel = new RequestDetail();
 
-            if (model == null)
-                return new(new { model }, ResultInfo.NotFound);
+            if (models == null || !models.Any())
+                return new(new { models }, ResultInfo.NotFound);
 
-            var stringPayload = JsonConvert.SerializeObject(model);
+            var responses = new List<object>();
 
-            if (model.ContractApiIntegrationCode != ClientList.AGT_Cargo.ContractApiIntegrationCode)
-                return new(new { }, ResultInfo.NotFound);
+            foreach (var model in models)
+            {
+                RequestDetail requestModel = new RequestDetail();
+                var stringPayload = JsonConvert.SerializeObject(model);
 
-            requestModel.UserId = ClientList.AGT_Cargo.UserId;
-            requestModel.RequestData = stringPayload;
-            requestModel.MethodName = "CancelIntegratedOrder";
-            requestModel.CreatedDate = DateTime.Now;
+                requestModel.UserId = ClientList.AGT_Cargo.UserId;
+                requestModel.RequestData = stringPayload;
+                requestModel.MethodName = "CancelIntegratedOrder";
+                requestModel.CreatedDate = DateTime.Now;
 
-            string responseData = await ImsartCancelOrder(model);
-            var response = JsonConvert.DeserializeObject<CancelResponse>(responseData);
+                if (model.ContractApiIntegrationCode != ClientList.AGT_Cargo.ContractApiIntegrationCode)
+                {
+                    requestModel.ResponseData = "Invalid ContractApiIntegrationCode";
+                    _requestRepository.Add(requestModel);
+                    continue;
+                }
 
+                try
+                {
+                    string responseData = await ImsartCancelOrder(model);
+                    var response = JsonConvert.DeserializeObject<CancelResponse>(responseData);
 
-            requestModel.ResponseData = responseData;
-            result.Data = response.d; //_requestRepository.FindById(1).ResponseData;// responseData;
-            _requestRepository.Add(requestModel);
+                    requestModel.ResponseData = responseData;
+                    responses.Add(new { model.Token, Success = true, Data = response?.d });
+                }
+                catch (Exception ex)
+                {
+                    requestModel.ResponseData = ex.Message;
+                    responses.Add(new { model.Token, Success = false, Error = ex.Message });
+                }
+                _requestRepository.Add(requestModel);
+            }
 
+            result.Data = responses;
             return result;
         }
 

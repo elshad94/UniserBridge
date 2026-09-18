@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Project.Core.Enums
+namespace Project.Core.Entities
 {
     public class ClientList
     {
         public static readonly ClientInfo AGT_Cargo = new ClientInfo
         {
             UserId = 4,
-            ContractApiIntegrationCode = "975fa39f17d"
+            ContractApiIntegrationCode = "f9c351667ca"
         };
     }
 
